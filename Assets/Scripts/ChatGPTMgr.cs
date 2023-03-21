@@ -4,6 +4,9 @@ using System.Net;
 using System.IO;
 using System.Threading;
 
+/// <summary>
+/// 请求ChatGPT数据类
+/// </summary>
 [System.Serializable] public class ChatGPTPostData
 {
     public string model;
@@ -12,6 +15,9 @@ using System.Threading;
     public int max_tokens;
 }
 
+/// <summary>
+/// ChatGPT返回数据类
+/// </summary>
 [System.Serializable] public class ChatGPTCallBackData
 {
     public string id;
@@ -45,17 +51,23 @@ public class ChatGPTMgr
         }
     }
 
+    // OpenAI ChatGPT API Key
     private static string chatGPTKey = "";
 
     private const string chatGPTUri = "https://api.openai.com/v1/completions";
+    // ChatGPT-3 模型
     private const string model = "text-davinci-003";
     private const float temperature = 0.5f;
     private const int max_tokens = 1024;
 
     private ChatGPTPostData chatGPTPostData;
     private int tryAgainTimes = 0;
+    // 打印，可以自定义打印的方法
     private static System.Action<string> PrintLogMethod;
 
+    /// <summary>
+    /// ChatGPT管理器初始化
+    /// </summary>
     private static void Initialize()
     {
         var keyPath = Path.Combine(UnityEngine.Application.dataPath, "Resources/key.txt");
@@ -66,11 +78,20 @@ public class ChatGPTMgr
         PrintLogMethod = UnityEngine.Debug.Log;
     }
 
+    /// <summary>
+    /// 执行打印函数
+    /// </summary>
+    /// <param name="result">需要打印的内容</param>
     private void CallDebugLog(string result)
     {
         PrintLogMethod(result);
     }
 
+    /// <summary>
+    /// 开始准备发消息
+    /// </summary>
+    /// <param name="msg">消息内容</param>
+    /// <param name="debugFunction">打印函数</param>
     public void Send(string msg, System.Action<string> debugFunction = null)
     {
         if (string.IsNullOrEmpty(chatGPTKey) || string.IsNullOrEmpty(msg))
@@ -85,12 +106,20 @@ public class ChatGPTMgr
         ThreadStart(msg);
     }
 
+    /// <summary>
+    /// 启动线程发消息（为了不阻塞主线程）
+    /// </summary>
+    /// <param name="msg">消息内容</param>
     private void ThreadStart(string msg)
     {
         Thread thread = new Thread(new ParameterizedThreadStart(RequestToChatGPT));
         thread.Start(msg);
     }
 
+    /// <summary>
+    /// 使用C# HttpWebRequest 来请求ChatGPT
+    /// </summary>
+    /// <param name="msg">消息内容</param>
     private void RequestToChatGPT(object msg)
     {
         try
@@ -123,10 +152,12 @@ public class ChatGPTMgr
         }
         catch(System.Exception ex)
         {
+            // 在部分时候出现网络异常，将再次递归请求ChatGPT，超过3次则报出错误！
             if(tryAgainTimes < 3)
             {
                 tryAgainTimes++;
                 ThreadStart((string)msg);
+                return;
             }
             CallDebugLog(ex.Message);
         }
