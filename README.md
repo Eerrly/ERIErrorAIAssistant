@@ -1,6 +1,4 @@
 # ERIErrorAIAssistant
-## 说明：
-***仅个人学习使用***
 ## 介绍：
 ***双击Unity的ErrorLog，使用ChatGPT来对其进行纠错(可以让策划，测试，程序使用，方便调试错误，快速定位)***
 - - -
@@ -8,8 +6,8 @@
 + Unity2019-2020 [Unity官方地址](https://unity.com/)
 + Visual Studio 
 ### 使用
-+ 将脚本放入Unity项目中
-+ key.txt中填写OpenAI的key
++ 将脚本放入 Unity 项目中
++ `Resources/key.txt` 中填写 [OpenAI Key](https://platform.openai.com/account/api-keys)
 - - -
 ### 功能
 <details>
